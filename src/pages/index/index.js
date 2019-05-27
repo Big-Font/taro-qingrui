@@ -1,58 +1,82 @@
-import Taro, { Component } from '@tarojs/taro'
-import { View, Button, Text } from '@tarojs/components'
-import { observer, inject } from '@tarojs/mobx'
+import Taro, { Component } from "@tarojs/taro";
+import { View, Swiper, SwiperItem, Image, Text } from "@tarojs/components";
+import { observer, inject } from "@tarojs/mobx";
+import { getIndex } from "../../apis/modules";
 
-import './index.scss'
+import "./index.scss";
 
-
-@inject('counterStore')
+@inject("counterStore")
 @observer
 class Index extends Component {
-
   config = {
-    navigationBarTitleText: '首页'
+    navigationBarTitleText: "首页"
+  };
+
+  state = {
+    bannerList: [],
+    caseList: [],
+    spikeList: []
+  };
+
+  componentWillMount() {}
+
+  componentWillReact() {
+    console.log("componentWillReact");
   }
 
-  componentWillMount () { }
-
-  componentWillReact () {
-    console.log('componentWillReact')
+  componentDidMount() {
+    getIndex().then(res => {
+      let { bannerList, caseList, spikeList } = res;
+      console.log(bannerList);
+      this.setState({
+        bannerList,
+        caseList,
+        spikeList
+      });
+    });
   }
 
-  componentDidMount () { }
+  componentWillUnmount() {}
 
-  componentWillUnmount () { }
+  componentDidShow() {}
 
-  componentDidShow () { }
+  componentDidHide() {}
 
-  componentDidHide () { }
-
-  increment = () => {
-    const { counterStore } = this.props
-    counterStore.increment()
+  handleClick() {
+    console.log(1);
   }
 
-  decrement = () => {
-    const { counterStore } = this.props
-    counterStore.decrement()
-  }
-
-  incrementAsync = () => {
-    const { counterStore } = this.props
-    counterStore.incrementAsync()
-  }
-
-  render () {
-    const { counterStore: { counter } } = this.props
+  render() {
+    let { bannerList, caseList, spikeList } = this.state;
     return (
       <View className='index'>
-        <Button onClick={this.increment}>+</Button>
-        <Button onClick={this.decrement}>-</Button>
-        <Button onClick={this.incrementAsync}>Add Async</Button>
-        <Text>{counter}</Text>
+        <Swiper
+          className='home-banner'
+          indicatorColor='#999'
+          indicatorActiveColor='#333'
+          circular
+          indicatorDots
+          autoplay
+        >
+          {bannerList.map((item, index) => (
+            <SwiperItem taroKey={index}>
+              <Image
+                mode='widthFix'
+                className='banner-img'
+                src={item.banner_url}
+              />
+            </SwiperItem>
+          ))}
+        </Swiper>
+        {caseList.map(item => (
+          <Text>{item.caselist_author}</Text>
+        ))}
+        {spikeList.map(item => (
+          <Text>{item.name}</Text>
+        ))}
       </View>
-    )
+    );
   }
 }
 
-export default Index 
+export default Index;
